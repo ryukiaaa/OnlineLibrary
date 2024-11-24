@@ -4,54 +4,49 @@
 <div class="card">
     <div class="card-body inline-flex">
         {% for book in books %}
-        
-            <a class="magic flex-nowrap {{ book.style }} {{book.color}} btt" href="book.html" role="button">{{book.name}} </a>
-        
+            {% if forloop.counter0 < 18 %}
+                <a class="flex-nowrap {{ book.style }} {{book.color}} btt" href="book/{{book.id}}" role="button">{{book.name|truncatechars:10}}</a>
+            {% endif %}
         {% endfor %}
-    
     </div>
-  </div>
-
-<div class="card">
-    <div class="card-body ">
-        {% for book in books %}
-        
-            <a class="magic flex-nowrap {{ book.style }} {{book.color}} btt" href="#" role="button">{{book.name}}</a>
-        
-        {% endfor %}
-    
-    </div>
-  </div>
+</div>
 
 <div class="card">
     <div class="card-body">
         {% for book in books %}
-        
-            <a class="magic flex-nowrap {{ book.style }} {{book.color}} btt" href="#" role="button">{{book.name}} </a>
-        
+            {% if forloop.counter0 >= 18 and forloop.counter0 < 36 %}
+                <a class="flex-nowrap {{ book.style }} {{book.color}} btt" href="book/{{book.id}}" role="button">{{book.name|truncatechars:10}}</a>
+            {% endif %}
         {% endfor %}
-    
     </div>
-  </div>
+</div>
 
 <div class="card">
     <div class="card-body">
         {% for book in books %}
-        
-            <a class="magic flex-nowrap {{ book.style }} {{book.color}} btt" href="#" role="button">{{book.name}} </a>
-        
+            {% if forloop.counter0 >= 36 and forloop.counter0 < 54 %}
+                <a class="flex-nowrap {{ book.style }} {{book.color}} btt" href="book/{{book.id}}" role="button">{{book.name|truncatechars:10}}</a>
+            {% endif %}
         {% endfor %}
-    
     </div>
-  </div>
+</div>
+
 <div class="card">
     <div class="card-body">
         {% for book in books %}
-        
-            <a class="magic flex-nowrap {{ book.style }} {{book.color}} btt" href="#" role="button">{{book.name}} </a>
-        
+            {% if forloop.counter0 >= 54 and forloop.counter0 < 72 %}
+                <a class="flex-nowrap {{ book.style }} {{book.color}} btt" href="book/{{book.id}}" role="button">{{book.name|truncatechars:10}}</a>
+            {% endif %}
         {% endfor %}
-    
     </div>
-  </div>
+</div>
+<div class="card">
+    <div class="card-body">
+        {% for book in books %}
+            {% if forloop.counter0 >= 72 and forloop.counter0 < 90 %}
+                <a class="flex-nowrap {{ book.style }} {{book.color}} btt" href="book/{{book.id}}" role="button">{{book.name|truncatechars:10}}</a>
+            {% endif %}
+        {% endfor %}
+    </div>
+</div>
 {% endblock %}

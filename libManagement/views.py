@@ -1,10 +1,12 @@
-from django.shortcuts import render, HttpResponse
+from django.shortcuts import render, HttpResponse, get_object_or_404
 from .models import Book
 import random
+from random import shuffle
 # Create your views here.
 
 def home(request):
-    books = Book.objects.all()
+    books = list(Book.objects.all())
+    shuffle(books)
     def getBook():
         temp =0
         for book in books:
@@ -37,12 +39,13 @@ def home(request):
             temp = n
        
     getBook()
+    
     return render(request, "home.html", {"books": books})
 
 def books(request):
     books = Book.objects.all()
     return render(request, "books.html", {"books": books})
 
-def book(request):
-    books = Book.objects.all()
-    return render(request, "book.html", {"books": books})
+def book(request, id):
+    book = get_object_or_404(Book, id=id)
+    return render(request, "book.html", {"book": book})
