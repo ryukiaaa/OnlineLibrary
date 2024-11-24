@@ -1,0 +1,57 @@
+{% extends "base.html" %} {% block title %} Books {% endblock %}
+{% block content %}
+
+<div class="card">
+    <div class="card-body inline-flex">
+        {% for book in books %}
+        
+            <a class="magic flex-nowrap {{ book.style }} {{book.color}} btt" href="book.html" role="button">{{book.name}} </a>
+        
+        {% endfor %}
+    
+    </div>
+  </div>
+
+<div class="card">
+    <div class="card-body ">
+        {% for book in books %}
+        
+            <a class="magic flex-nowrap {{ book.style }} {{book.color}} btt" href="#" role="button">{{book.name}}</a>
+        
+        {% endfor %}
+    
+    </div>
+  </div>
+
+<div class="card">
+    <div class="card-body">
+        {% for book in books %}
+        
+            <a class="magic flex-nowrap {{ book.style }} {{book.color}} btt" href="#" role="button">{{book.name}} </a>
+        
+        {% endfor %}
+    
+    </div>
+  </div>
+
+<div class="card">
+    <div class="card-body">
+        {% for book in books %}
+        
+            <a class="magic flex-nowrap {{ book.style }} {{book.color}} btt" href="#" role="button">{{book.name}} </a>
+        
+        {% endfor %}
+    
+    </div>
+  </div>
+<div class="card">
+    <div class="card-body">
+        {% for book in books %}
+        
+            <a class="magic flex-nowrap {{ book.style }} {{book.color}} btt" href="#" role="button">{{book.name}} </a>
+        
+        {% endfor %}
+    
+    </div>
+  </div>
+{% endblock %}
