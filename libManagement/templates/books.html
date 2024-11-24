@@ -1,0 +1,17 @@
+{% extends "base.html" %} 
+{% block content %}
+<h1>Book List</h1> 
+<ul>
+    {% for book in books %}
+    <li> 
+        {{book.name}}: {% if book.available %}Here{% else %}Not Here{% endif %}
+    </li>
+    {% endfor %}
+</ul>
+
+{% if greeting == 1 %}
+  <h1>Hello</h1>
+{% endif %} 
+
+
+{% endblock %}
