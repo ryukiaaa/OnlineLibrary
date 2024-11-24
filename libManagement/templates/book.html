@@ -1,15 +1,12 @@
 {% extends "base.html" %} {% block title %} Books {% endblock %}
 {% block content %}
 <div class="book">
-    <a >
-        
+    <a href="{% url 'book-detail' book.id %}">
     </a>
-    <div class = "details">
+    <div class="details">
         <p>Name: {{book.name}}</p>
-        <p>Author: {{book.name}}</p>
-        <p>{{book.name}}</p>
-
+        <p>Author: {{book.author}}</p>
+        <p>Date: {{book.date}}</p>
     </div>
-
 </div>
-{% endblock %} 
+{% endblock %}
