@@ -1,12 +1,21 @@
 {% extends "base.html" %} {% block title %} Books {% endblock %}
 {% block content %}
 <div class="book">
-    <a href="{% url 'book-detail' book.id %}">
-    </a>
-    <div class="details">
-        <p>Name: {{book.name}}</p>
-        <p>Author: {{book.author}}</p>
-        <p>Date: {{book.date}}</p>
+    <a href="http://127.0.0.1:8000/" class="back-button">&lt; {{ book.name }}</a>
+    
+    <div class="book-content">
+        <div class="book-image"></div>
+        
+        <div class="details">
+            <p><strong>Author:</strong> {{ book.author }}</p>
+            <p><strong>Publisher:</strong> {{ book.publisher }}</p>
+            <p><strong>Year of Publish:</strong> {{ book.year_published }}</p>
+            <p><strong>Genre:</strong> {{ book.genre }}</p>
+            <p><strong>Description:</strong></p>
+            <p>{{ book.synopsis }}</p>
+        </div>
     </div>
+    
+    <button class="borrow-button">Borrow</button>
 </div>
-{% endblock %}
+{% endblock %} 

@@ -1,5 +1,5 @@
 from django.shortcuts import render, HttpResponse, get_object_or_404
-from .models import Book
+from .models import Book, Genre
 import random
 from random import shuffle
 # Create your views here.
@@ -12,7 +12,7 @@ def home(request):
         for book in books:
             
             list1 = [90,45]
-            colors =[ "050506","2B154B","6F0731"]
+            colors =[ "050506","3b0764","4a044e","4c0519", "082f49","1e1b4b"]
             n = random.choice(list1)
             book.dbug = str(temp)
             if temp == 90:  
@@ -43,8 +43,36 @@ def home(request):
     return render(request, "home.html", {"books": books})
 
 def books(request):
+    query = request.GET.get('q')
+    genre_filter = request.GET.get('genre') 
     books = Book.objects.all()
-    return render(request, "books.html", {"books": books})
+    genres = Genre.objects.all()
+
+    if query:
+        books = books.filter(name__icontains=query)
+
+    if genre_filter:
+        books = books.filter(genre__name=genre_filter)
+
+    context = {
+        'books': books,
+        'genres': genres,
+        'query': query,
+        'selected_genre': genre_filter,
+    }
+
+    colors = ["3b0764","4a044e","4c0519", "082f49","1e1b4b"]
+    widths = ["w-1/4", "w-2/5", "w-4/12", "w-5/12", "w-2/6"]
+
+    books_list = list(books)
+    for book in books_list:
+        book.color = "bg-[#" + random.choice(colors) + "]"
+        book.width = random.choice(widths)
+
+    # Debug the context
+    print("Context being sent to template:", context)
+
+    return render(request, "books.html", context)
 
 def book(request, id):
     book = get_object_or_404(Book, id=id)

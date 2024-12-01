@@ -1,17 +1,45 @@
 {% extends "base.html" %} 
 {% block content %}
-<h1>Book List</h1> 
-<ul>
+
+<div class="w-full booklist">
+
+  <form method="get" class="mb-0">
+    <div class="filter flex items-center">
+      <div class="relative">
+        <select 
+            name="genre" 
+            id="genre"
+            class="px-3 py-2 bg-[#1a1a1a] border border-[#333333] text-white rounded-full focus:ring-0 focus:border-[#333333]">
+            <option value="">Genre</option>
+            {% for genre in genres %}
+                <option value="{{ genre.name }}" {% if genre.name == selected_genre %}selected{% endif %}>
+                    {{ genre.name }}
+                </option>
+            {% endfor %}
+        </select>
+      </div>
+   
+      <input 
+          type="text" 
+          name="q" 
+          placeholder="SEARCH...." 
+          value="{{ query|default:'' }}" 
+          class="px-3 py-2 w-full max-w-sm bg-[#1a1a1a] border border-[#333333] text-white rounded-full focus:ring-0 focus:border-[#333333]"
+      >
+    </div>
+  </form>
+
+  <div class="pile">
     {% for book in books %}
-    <li> 
-        {{book.name}}: {% if book.available %}Here{% else %}Not Here{% endif %}
-    </li>
+    <div class="{{ book.width }} {{ book.color }} text-white px-4 py-3 text-sm rounded-sm border border-7f1d1d shadow-sm">
+        <a href="http://127.0.0.1:8000/book/{{ book.id }}" class="no-underline text-white">
+            {{ book.name }}
+        </a>
+    </div>
+    {% empty %}
+    <p class="text-center text-gray-400">No books found.</p>
     {% endfor %}
-</ul>
-
-{% if greeting == 1 %}
-  <h1>Hello</h1>
-{% endif %} 
-
+</div>
+</div>
 
 {% endblock %}
