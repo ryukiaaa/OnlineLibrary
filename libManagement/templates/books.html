@@ -1,45 +1,46 @@
 {% extends "base.html" %} 
 {% block content %}
 
-<div class="w-full booklist">
-
-  <form method="get" class="mb-0">
-    <div class="filter flex items-center">
-      <div class="relative">
-        <select 
-            name="genre" 
-            id="genre"
-            class="px-3 py-2 bg-[#1a1a1a] border border-[#333333] text-white rounded-full focus:ring-0 focus:border-[#333333]">
-            <option value="">Genre</option>
-            {% for genre in genres %}
-                <option value="{{ genre.name }}" {% if genre.name == selected_genre %}selected{% endif %}>
-                    {{ genre.name }}
-                </option>
-            {% endfor %}
-        </select>
-      </div>
+<div class="w-full booklist bg-[#AC9C8D] min-h-screen">
+  <!-- Search and Filter -->
+  <div class="filter">
+    <form method="get">
+      
+      <label for="genre">Genre: </label>
+      <select 
+          name="genre" 
+        id="genre"
+        class="px-4 py-1 bg-[#1a1a1a] border border-[#333] text-white rounded text-sm focus:ring-0">
+        <option value="">None</option>
+        {% for genre in genres %}
+            <option value="{{ genre.name }}" {% if genre.name == selected_genre %}selected{% endif %}>
+                {{ genre.name }}
+            </option>
+        {% endfor %}
+    </select>
+    <input 
+    type="text" 
+    name="q" 
+    placeholder="SEARCH by Name...." 
+    value="{{ query|default:'' }}" 
+    class="px-4 py-1 w-48 bg-[#1a1a1a] border border-[#333] text-white rounded text-sm focus:ring-0"
+    >
+    <button type="submit" class="bt btn-primary">Search</button>
    
-      <input 
-          type="text" 
-          name="q" 
-          placeholder="SEARCH...." 
-          value="{{ query|default:'' }}" 
-          class="px-3 py-2 w-full max-w-sm bg-[#1a1a1a] border border-[#333333] text-white rounded-full focus:ring-0 focus:border-[#333333]"
-      >
-    </div>
-  </form>
+    </form>
+  </div>
 
-  <div class="pile">
+  <div class="pile grid grid-cols-3 -gap-2"> 
     {% for book in books %}
-    <div class="{{ book.width }} {{ book.color }} text-white px-4 py-3 text-sm rounded-sm border border-7f1d1d shadow-sm">
-        <a href="http://127.0.0.1:8000/book/{{ book.id }}" class="no-underline text-white">
-            {{ book.name }}
-        </a>
+    <div class="shelf">
+      <a href="/book/{{ book.id }}" alt="{{ book.name }}" class="book-pile {{ book.width }} {{ book.color }}  px-4 py-3 text-sm rounded-sm no-underline text-white">
+              {{ book.name }}
+      </a>
     </div>
     {% empty %}
     <p class="text-center text-gray-400">No books found.</p>
     {% endfor %}
-</div>
+  </div>
 </div>
 
 {% endblock %}
