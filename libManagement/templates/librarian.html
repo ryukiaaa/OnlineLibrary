@@ -1,0 +1,46 @@
+{% extends "base.html" %} 
+{% block content %}
+
+<div class="w-full booklist bg-[#AC9C8D] min-h-screen">
+  <!-- Search and Filter -->
+  <div class="filter">
+    <form method="get">
+      
+      <label for="genre">Genre: </label>
+      <select 
+          name="genre" 
+        id="genre"
+        class="px-4 py-1 bg-[#1a1a1a] border border-[#333] text-white rounded text-sm focus:ring-0">
+        <option value="">None</option>
+        {% for genre in genres %}
+            <option value="{{ genre.name }}" {% if genre.name == selected_genre %}selected{% endif %}>
+                {{ genre.name }}
+            </option>
+        {% endfor %}
+    </select>
+    <input 
+    type="text" 
+    name="q" 
+    placeholder="SEARCH by Name...." 
+    value="{{ query|default:'' }}" 
+    class="px-4 py-1 w-48 bg-[#1a1a1a] border border-[#333] text-white rounded text-sm focus:ring-0"
+    >
+    <button type="submit" class="bt btn-primary">Search</button>
+   
+    </form>
+  </div>
+
+  <div class="pile grid grid-cols-3 -gap-2"> 
+    {% for book in books %}
+    <div class="shelf">
+      <a href="/book/{{ book.id }}" alt="{{ book.name }}" class="book-pile {{ book.width }} {{ book.color }}  px-4 py-3 text-sm rounded-sm no-underline text-white">
+              {{ book.name }}
+      </a>
+    </div>
+    {% empty %}
+    <p class="text-center text-gray-400">No books found.</p>
+    {% endfor %}
+  </div>
+</div>
+
+{% endblock %}

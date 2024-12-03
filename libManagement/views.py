@@ -1,8 +1,39 @@
-from django.shortcuts import render, HttpResponse, get_object_or_404
+from django.shortcuts import render, HttpResponse, get_object_or_404, redirect
 from .models import Book, Genre
+from .forms import SignupForm, LoginForm
 import random
 from random import shuffle
+from django.contrib.auth import login, authenticate
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.decorators import login_required
 # Create your views here.
+
+def signup_view(request):
+    if request.method == 'POST':
+        form = SignupForm(request.POST)
+        if form.is_valid():
+            user = form.save()  # Save the new user
+            login(request, user)  # Automatically log the user in
+            return redirect('home')  # Redirect to the home page
+    else:
+        form = SignupForm()
+    return render(request, 'signup.html', {'form': form})
+
+
+def login_view(request):
+    if request.user.is_authenticated:
+        return redirect('home')  # Redirect if the user is already logged in
+
+    if request.method == 'POST':
+        form = AuthenticationForm(data=request.POST)
+        if form.is_valid():
+            user = form.get_user()
+            login(request, user)  # Log the user in
+            return redirect('home')
+    else:
+        form = AuthenticationForm()
+    return render(request, 'login.html', {'form': form})
 
 def home(request):
     books = list(Book.objects.all())
@@ -42,6 +73,7 @@ def home(request):
     
     return render(request, "home.html", {"books": books})
 
+
 def books(request):
     query = request.GET.get('q')
     genre_filter = request.GET.get('genre') 
@@ -62,7 +94,7 @@ def books(request):
     }
 
     colors = ["3b0764","4a044e","4c0519", "082f49","1e1b4b"]
-    widths = ["w-1/4", "w-2/5", "w-4/12", "w-5/12", "w-2/6"]
+    widths = ["w-3/4", "w-10/12", "w-4/5", "w-5/6", "w-9/12"]
 
     books_list = list(books)
     for book in books_list:

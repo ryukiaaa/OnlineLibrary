@@ -1,5 +1,7 @@
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.db import models
 from django.db.models import Q
+from django.contrib.auth.hashers import make_password
 
 # Create your models here.
 
@@ -33,13 +35,50 @@ class Book(models.Model):
     def __str__(self):
         return self.name
     
-class User(models.Model):
+class UserManager(BaseUserManager):
+    
+    def create_user(self, username, password, first_name, last_name, user_type, **extra_fields):
+        if not username:
+            raise ValueError("The Username field must be set")
+        user = self.model(username=username, first_name=first_name, last_name=last_name, user_type=user_type, **extra_fields)
+        user.set_password(password) 
+        user.save(using=self._db)
+        return user
+
+    def create_superuser(self, username, password, first_name, last_name, user_type, **extra_fields):
+        extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_superuser', True)
+
+        if not extra_fields.get('is_staff'):
+            raise ValueError("Superuser must have is_staff=True.")
+        if not extra_fields.get('is_superuser'):
+            raise ValueError("Superuser must have is_superuser=True.")
+
+        return self.create_user(username, password, first_name, last_name, user_type, **extra_fields)
+    
+    
+class User(AbstractBaseUser, PermissionsMixin):
+    
+
+    username = models.CharField(max_length=100, unique=True, default=make_password('defaultpassword123'))
+    password = models.CharField(max_length=100, default=make_password('defaultpassword123'))
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
-    user_type = models.CharField(max_length=50)  
-    
+    user_type = models.CharField(max_length=50, choices=[
+        ('admin', 'Admin'),
+        ('student', 'Student'),
+        ('librarian', 'Librarian'),
+    ])  
+    is_active = models.BooleanField(default=True)
+    is_staff = models.BooleanField(default=False)  # Required for admin access
+
+    objects = UserManager()
+
+    USERNAME_FIELD = 'username'
+    REQUIRED_FIELDS = ['first_name', 'last_name', 'user_type']
+
     def __str__(self):
-        return f"{self.first_name} {self.last_name}"
+        return f"{self.first_name} {self.last_name} ({self.username})"
 
 class Borrow(models.Model):
     book = models.ForeignKey(Book, on_delete=models.CASCADE, related_name="borrows")
