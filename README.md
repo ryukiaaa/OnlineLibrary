@@ -60,25 +60,26 @@ Make sure you have the following installed:
 ```bash
 git clone https://github.com/yourusername/online-library.git
 cd online-library
-
+ ```
 Apply the database migrations:
-    ```bash
+
+```bash
     python manage.py makemigrations
     python manage.py migrate
-    ```
+```
 Create a superuser to access the Django admin interface:
-    ```bash
+```bash
     python manage.py createsuperuser
-    ```
+```
    Follow the prompts to enter a username, email, and password for the superuser.
 
 Run the development server:
-    ```bash
+```bash
     python manage.py runserver
-
+```
 Access the admin interface by navigating to `{server}/admin` in your web browser and log in with your superuser account.
-
+```bash
 Update the role of the superuser as required.
-
+```
 
 
