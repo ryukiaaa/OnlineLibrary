@@ -2,9 +2,7 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, Permis
 from django.db import models
 from django.db.models import Q
 from django.contrib.auth.hashers import make_password
-
-# Create your models here.
-
+import uuid
 
 
 class Genre(models.Model):
@@ -22,6 +20,7 @@ class Author(models.Model):
         return f"{self.first_name} {self.last_name}"
     
 class Book(models.Model):
+    bookId = models.CharField(max_length=255, unique=True)
     name = models.CharField(max_length=200)
     publisher = models.CharField(max_length=100, default="Unknown")
     year_published = models.IntegerField(null=True, blank=True, default=0)
@@ -59,7 +58,7 @@ class UserManager(BaseUserManager):
     
 class User(AbstractBaseUser, PermissionsMixin):
     
-
+    id = models.AutoField(primary_key=True) 
     username = models.CharField(max_length=100, unique=True, default=make_password('defaultpassword123'))
     password = models.CharField(max_length=100, default=make_password('defaultpassword123'))
     first_name = models.CharField(max_length=100)
@@ -81,11 +80,12 @@ class User(AbstractBaseUser, PermissionsMixin):
         return f"{self.first_name} {self.last_name} ({self.username})"
 
 class Borrow(models.Model):
-    book = models.ForeignKey(Book, on_delete=models.CASCADE, related_name="borrows")
+    borrowId = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    book = models.ForeignKey(Book, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="borrowed_books")
     borrow_date = models.DateField(auto_now_add=True)
     borrow_returned = models.DateField(null=True, blank=True)
-    status = models.CharField(max_length=50, default="Borrowed")  
+    status = models.CharField(max_length=50, default="Borrowed")   
 
     class Meta:
         constraints = [

@@ -33,7 +33,7 @@
   <div class="pile grid grid-cols-3 -gap-2"> 
     {% for book in books %}
     <div class="shelf">
-      <a href="/book/{{ book.id }}" alt="{{ book.name }}" class="book-pile {{ book.width }} {{ book.color }}  px-4 py-3 text-sm rounded-sm no-underline text-white">
+      <a href="http://127.0.0.1:8000/book/{{ book.id }}" alt="{{ book.name }}" class="book-pile {{ book.width }} {{ book.color }}  px-4 py-3 text-sm rounded-sm no-underline text-white">
               {{ book.name }}
       </a>
     </div>

@@ -1,35 +1,42 @@
 from django.shortcuts import render, HttpResponse, get_object_or_404, redirect
-from .models import Book, Genre
+from django.http import JsonResponse 
+from .models import Book, Genre, User, Borrow
 from .forms import SignupForm, LoginForm
 import random
 from random import shuffle
-from django.contrib.auth import login, authenticate
-from django.contrib.auth.forms import UserCreationForm
+from django.utils import timezone
+from django.contrib.auth import login, authenticate, logout
+from django.core.exceptions import ObjectDoesNotExist
+from django.db import IntegrityError
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.decorators import login_required
-# Create your views here.
+import json
+import traceback
+
+def logout_view(request):
+    logout(request)
+    return redirect('home')
 
 def signup_view(request):
     if request.method == 'POST':
         form = SignupForm(request.POST)
         if form.is_valid():
-            user = form.save()  # Save the new user
-            login(request, user)  # Automatically log the user in
-            return redirect('home')  # Redirect to the home page
+            user = form.save()  
+            login(request, user)  
+            return redirect('home') 
     else:
         form = SignupForm()
     return render(request, 'signup.html', {'form': form})
 
-
 def login_view(request):
     if request.user.is_authenticated:
-        return redirect('home')  # Redirect if the user is already logged in
+        return redirect('home')  
 
     if request.method == 'POST':
         form = AuthenticationForm(data=request.POST)
         if form.is_valid():
             user = form.get_user()
-            login(request, user)  # Log the user in
+            login(request, user) 
             return redirect('home')
     else:
         form = AuthenticationForm()
@@ -73,7 +80,6 @@ def home(request):
     
     return render(request, "home.html", {"books": books})
 
-
 def books(request):
     query = request.GET.get('q')
     genre_filter = request.GET.get('genre') 
@@ -101,11 +107,93 @@ def books(request):
         book.color = "bg-[#" + random.choice(colors) + "]"
         book.width = random.choice(widths)
 
-    # Debug the context
-    print("Context being sent to template:", context)
-
     return render(request, "books.html", context)
 
 def book(request, id):
     book = get_object_or_404(Book, id=id)
     return render(request, "book.html", {"book": book})
+
+def delete_book(request, book_id):
+    if request.method == "DELETE":
+        book = get_object_or_404(Book, id=book_id)
+        book.delete()
+        return JsonResponse({"success": True})
+    return JsonResponse({"success": False}, status=405)
+
+def update_book_status(request, book_id):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            new_status = data.get('status')
+            book = Book.objects.get(id=book_id)
+            book.status = new_status
+            book.save()
+            return JsonResponse({'success': True}, status=200)
+        except Book.DoesNotExist:
+            return JsonResponse({'error': 'Book not found'}, status=404)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+    return JsonResponse({'error': 'Invalid request method'}, status=400)
+
+def librarian(request):
+    query = request.GET.get('q')
+    genre_filter = request.GET.get('genre') 
+    books = Book.objects.all()
+    genres = Genre.objects.all()
+    students = User.objects.all()
+
+    if query:
+        books = books.filter(name__icontains=query)
+
+    if genre_filter:
+        books = books.filter(genre__name=genre_filter)
+
+    context = {
+        'books': books,
+        'genres': genres,
+        'query': query,
+        'selected_genre': genre_filter,
+    }
+
+    return render(request, "librarian.html", context)
+    
+@login_required
+def borrow_book(request, bookId):
+    try:
+        print(f"Received borrow request for bookId: {bookId}, User: {request.user}")
+
+        book = Book.objects.get(bookId=bookId)
+        print(f"Book found: {book.name}, Status: {book.status}")
+
+        if book.status in ['Borrowed', 'Maintenance']:
+            print(f"Book {book.name} is not available.")
+            return JsonResponse({'message': 'Book not available'}, status=400)
+
+        if Borrow.objects.filter(book=book, borrow_returned__isnull=True).exists():
+            print(f"Book {book.name} is already borrowed by another user.")
+            return JsonResponse({'message': 'Book already borrowed by someone else'}, status=400)
+
+        borrow_record = Borrow.objects.create(
+            book=book,
+            user=request.user,
+            borrow_date=timezone.now(),
+            status='Borrowed'
+        )
+        print(f"Borrow record created for book: {book.name}, User: {request.user}")
+
+        book.status = 'Borrowed'
+        book.save()
+        print(f"Book {book.name} status updated to 'Borrowed'.")
+
+        return JsonResponse({'message': 'Book borrowed successfully'}, status=200)
+
+    except ObjectDoesNotExist:
+        print(f"Error: Book with id {bookId} not found.")
+        return JsonResponse({'message': 'Book not found'}, status=404)
+    except IntegrityError as e:
+        print(f"Error: IntegrityError - {str(e)}")
+        return JsonResponse({'message': f'Error with borrowing the book: {str(e)}'}, status=500)
+    except Exception as e:
+        error_message = traceback.format_exc()
+        print(f"Full Exception Trace: {error_message}")
+        return JsonResponse({'message': f'Error with borrowing the book: {str(e)}'}, status=500)

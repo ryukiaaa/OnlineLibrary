@@ -4,7 +4,7 @@
 <div class="w-full booklist bg-[#AC9C8D] min-h-screen">
   <!-- Search and Filter -->
   <div class="filter">
-    <form method="get">
+    <form method="get" action="{% url 'librarian' %}">
       
       <label for="genre">Genre: </label>
       <select 
@@ -29,18 +29,139 @@
    
     </form>
   </div>
-
-  <div class="pile grid grid-cols-3 -gap-2"> 
-    {% for book in books %}
+  <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+  <div class="pile"> 
     <div class="shelf">
-      <a href="/book/{{ book.id }}" alt="{{ book.name }}" class="book-pile {{ book.width }} {{ book.color }}  px-4 py-3 text-sm rounded-sm no-underline text-white">
-              {{ book.name }}
-      </a>
-    </div>
-    {% empty %}
-    <p class="text-center text-gray-400">No books found.</p>
-    {% endfor %}
+        <table class="table-fixed min-w-full table-auto">
+            <thead>
+                <tr class="bg-[#1a1a1a] text-white ">
+                    <th class="py-2 px-4 text-left w-1/6">Name</th>
+                    <th class="py-2 px-4 text-left">Edition</th>
+                    <th class="py-2 px-4 text-left">Genre</th>
+                    <th class="py-2 px-4 text-left">Author</th>
+                    <th class="py-2 px-4 text-left">Book Type</th>
+                    <th class="py-2 px-4 text-left">Publisher</th>
+                    <th class="py-2 px-4 text-left">Year Published</th>
+                    <th class="py-2 px-4 text-left">Status</th>
+                    <th class="py-2 px-4 text-left"></th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Assuming books is a list of book objects passed from Django template -->
+                {% for book in books %}
+                <tr class="border-b text-black">
+                    <td class="py-2 px-4">{{ book.name }}</td>
+                    <td class="py-2 px-4">{{ book.edition }}</td>
+                    <td class="py-2 px-4">{% if book.genre %}
+                        {{ book.genre.name }}
+                    {% else %}
+                        N/A
+                    {% endif %}</td>
+                    <td class="py-2 px-4">{% if book.author %}
+                        {{ book.author.name }}
+                    {% else %}
+                        N/A
+                    {% endif %}</td>
+                    <td class="py-2 px-4">{{ book.book_type }}</td>
+                    <td class="py-2 px-4">{{ book.publisher }}</td>
+                    <td class="py-2 px-4">{{ book.year_published }}</td>
+                    <td class="py-2 px-4">
+                        <div class="relative inline-block">
+                            <button class="bg-blue-500 text-white px-4 py-1 rounded" onclick="toggleDropdown('{{ book.bookId }}')" type="button">
+                                {{ book.status }}
+                            </button>
+                            
+                            <div
+                                id="dropdown-{{ book.bookId }}"
+                                class="hidden absolute mt-1 bg-white border border-gray-300 rounded shadow-lg z-10">
+                                <button onclick="updateStatus('{{ book.bookId }}', 'Maintenance')" class="block px-4 py-2 text-gray-700 hover:bg-gray-100" type="button">Maintenance</button>
+                                <button onclick="updateStatus('{{ book.bookId }}', 'Available')" class="block px-4 py-2 text-gray-700 hover:bg-gray-100" type="button">Available</button>
+                                <button onclick="updateStatus('{{ book.bookId }}', 'Borrowed')" class="block px-4 py-2 text-gray-700 hover:bg-gray-100" type="button">Borrowed</button>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="py-2 px-4">
+                        <a  class="text-blue-500 hover:text-blue-700" type="button">Delete</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="8" class="text-center text-gray-400 py-4">No books found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
   </div>
 </div>
+
+<script>
+    function toggleDropdown(bookId) {
+        const dropdown = document.getElementById(`dropdown-${bookId}`);
+
+            if (dropdown.style.display === "none" || !dropdown.style.display) {
+                dropdown.style.display = "block";
+            } else {
+                dropdown.style.display = "none";
+            }
+
+    }
+
+    function deleteBook(book_id) {
+        if (confirm("Are you sure you want to delete this book?")) {
+            fetch(`/delete-book/${bookId}/`, {
+                method: "DELETE",
+                headers: {
+                    "X-CSRFToken": getCSRFToken(),
+                },
+            })
+                .then((response) => response.json())
+                .then((data) => {
+                    if (data.success) {
+                        alert("Book deleted successfully!");
+                        location.reload();
+                    } else {
+                        alert("Failed to delete the book.");
+                    }
+                });
+        }
+    }
+
+    function updateStatus(bookId, newStatus) {
+        console.log(getCSRFToken());
+        fetch(`/update-book-status/${bookId}/`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": getCSRFToken(),
+                "Accept": "application/json",
+            },
+            body: JSON.stringify({ status: newStatus }),
+        })
+        .then((response) => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then((data) => {
+            if (data.success) {
+                const statusButton = document.querySelector(`button[onclick="toggleDropdown('${bookId}')"]`);
+                statusButton.textContent = newStatus;
+                toggleDropdown(bookId); 
+            } else {
+                alert("Failed to update status: " + (data.error || "Unknown error"));
+            }
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+            alert("Failed to update status. Please try again.");
+        });
+    }
+
+    function getCSRFToken() {
+        const csrfToken = document.querySelector("[name=csrfmiddlewaretoken]").value;
+        return csrfToken;
+    }
+</script>
 
 {% endblock %}

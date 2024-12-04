@@ -16,6 +16,37 @@
         </div>
     </div>
     
-    <button class="borrow-button">Borrow</button>
+    <button class="borrow-button" id="borrowButton" data-book-id="{{ book.bookId }}">Borrow</button>
+    <p id="message"></p> 
 </div>
+
+<script>
+document.getElementById('borrowButton').addEventListener('click', function() {
+    const bookId = this.getAttribute('data-book-id');
+    console.log('Book ID:', bookId);
+    fetch(`/borrow/${bookId}/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': '{{ csrf_token }}'
+        },
+        body: JSON.stringify({})
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log(data);
+        const messageElement = document.getElementById('message');
+        if (data.status === 200) {
+            messageElement.textContent = data.message;
+            messageElement.style.color = 'green';
+        } else {
+            messageElement.textContent = data.message;
+            messageElement.style.color = 'red';
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+});
+</script>
 {% endblock %} 
