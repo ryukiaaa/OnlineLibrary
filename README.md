@@ -39,9 +39,8 @@ The Online Library is a web application built with Django that allows users to b
 
 ## Documentation
 
-- **UI/UX Design:** [View here]([https://www.figma.com/design/cGeJra3y2jRemYDJfZQise/System-UI%2FUX?node-id=0-1](https://www.figma.com/design/pybJ8EehmIskXU07ULHOR7/BrainVault?node-id=0-1&t=pfe0Org42ogm2jzp-1))
-- **ERD:** [View here](![image](https://github.com/user-attachments/assets/de04f98f-7cfb-4cd6-95de-5dd93e0c5812))
-)
+- **UI/UX Design:** [View here](https://www.figma.com/design/pybJ8EehmIskXU07ULHOR7/BrainVault?node-id=0-1&t=pfe0Org42ogm2jzp-1)
+- **ERD:** ![image](https://github.com/user-attachments/assets/de04f98f-7cfb-4cd6-95de-5dd93e0c5812)
 
 ## Installation
 
